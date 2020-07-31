@@ -1,0 +1,29 @@
+sudo docker run \
+--name mongodb \
+-p 27017:27017 \
+-e MONGO_INITDB_ROOT_USERNAME=admin \
+-e MONGO_INITDB_ROOT_PASSWORD=senhaadmin \
+-d \
+mongo:4 \
+
+sudo docker run \
+--name mongoclient \
+-p 3000:3000 \
+--link mongodb:mongodb \
+-d \
+mongoclient/mongoclient \
+
+docker exec -it mongodb \
+mongo --host localhost \
+-u admin -p senhaadmin \
+--authenticationDatabase admin \
+--eval "db.getSiblingDB('users').createUser({user:'edsonbruno',pwd:'api3007',roles:[{role: 'readWrite', db: 'users'}]})" \
+
+db.createUser({ 
+  user: "edsonbruno",
+  pwd: "api3007",
+  roles: [ 
+    { role: "readWrite", 
+      db: "users" } 
+    ] 
+})
