@@ -1,0 +1,8 @@
+{ 
+  user: "edsonbruno",
+  pwd: "api3007",
+  roles: [ 
+    { role: "readWrite", 
+      db: "users" } 
+    ] 
+}
