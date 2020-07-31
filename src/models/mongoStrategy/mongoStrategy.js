@@ -24,13 +24,21 @@ class MongoStrategy extends IContext {
     return connection;
   }
 
-  async create(user) {
-    const newUser = await this.schema.create(user);
+  async create(item) {
+    const newUser = await this.schema.create(item);
     return newUser;
   }
 
-  read() {
-    return this.schema.find();
+  read(item, skip = 0, limit = 10) {
+    return this.schema.find(item).skip(skip).limit(limit);
+  }
+
+  update(id, item) {
+    return this.schema.updateOne({ _id: id }, { $set: item });
+  }
+
+  delete(id) {
+    return this.schema.deleteOne({ _id: id });
   }
 }
 
