@@ -1,6 +1,6 @@
 const Context = require('../src/models/context/context');
 const MongoStrategy = require('../src/models/mongoStrategy/mongoStrategy');
-const UserSchema = require('../src/models/schemas/user');
+const UserSchema = require('../src/models/schemas/userSchema');
 const assert = require('assert');
 const DateToString = require('../src/util/dateToString');
 

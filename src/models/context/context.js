@@ -10,8 +10,8 @@ class Context extends IContext {
     return this.db.create(item);
   }
 
-  read(id) {
-    return this.db.read(id);
+  read(item, skip, limit) {
+    return this.db.read(item, skip, limit);
   }
 
   update(id, item) {

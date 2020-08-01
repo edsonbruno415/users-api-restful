@@ -1,30 +1,80 @@
 const Hapi = require('@hapi/hapi');
+const Joi = require('@hapi/joi');
+const Context = require('./models/context/context');
+const MongoStrategy = require('./models/mongoStrategy/mongoStrategy');
+const userSchema = require('./models/schemas/userSchema');
+const jwt = require('./util/jwt');
+const hashPassword = require('./util/hashPassword');
+const DateToString = require('./util/dateToString');
 
 async function main() {
+  const connection = MongoStrategy.connect();
+  const users = new Context(new MongoStrategy(connection, userSchema));
+
   const app = Hapi.server({
-    port: 3000,
+    port: 3333,
     host: 'localhost',
   });
 
-  /* app.route([
+  app.route([
     {
       method: 'POST',
       path: '/sign_up',
-      handler: (request, headers) => {
+      options: {
+        validate: {
+          payload: Joi.object({
+            nome: Joi.string().min(3).max(45).required(),
+            email: Joi.string().min(3).required(),
+            senha: Joi.string().min(6).required(),
+            telefones: Joi.array().items(
+              Joi.object({
+                numero: Joi.string().pattern(/\d{8,9}/).max(9).required(),
+                ddd: Joi.string().pattern(/\d{2}/).max(2).required(),
+              }),
+            ),
+          }),
+        },
       },
-    },
-    {
-      method: 'POST',
-      path: 'sign_in',
-      handler: () => {
+      handler: async (request, h) => {
+        try {
+          const user = request.payload;
 
+          const [userDB] = await users.read({ email: user.email });
+
+          if (userDB) {
+            return h.response({
+              mensagem: 'E-mail ja existente!',
+            }).code(409);
+          }
+
+          const newUser = {
+            id: '',
+            ...user,
+            senha: await hashPassword.createHash(user.senha),
+            data_criacao: DateToString(new Date()),
+            data_atualizacao: DateToString(new Date()),
+            ultimo_login: DateToString(new Date()),
+            token: await jwt.getToken({
+              nome: user.nome,
+              email: user.email,
+            }),
+          };
+
+          const { id } = await users.create(newUser);
+
+          newUser.id = id;
+          return h.response(newUser).code(201);
+        } catch (err) {
+          return h.response({
+            mensagem: err.message,
+          });
+        }
       },
     },
-  ]); */
+  ]);
 
   await app.start();
-  // const { port, host, protocol } = app.info;
-  // console.log(`Application is running on ${protocol}://${host}:${port}`);
+
   return app;
 }
 

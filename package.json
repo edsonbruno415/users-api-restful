@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node src/app.js",
+    "dev" : "nodemon src/app.js",
     "eslint": "node node_modules/eslint/bin/eslint . --fix",
     "test": "node node_modules/mocha/bin/mocha tests/*.js",
     "test:watch": "node node_modules/mocha/bin/mocha tests/*.js -w"
@@ -25,6 +27,7 @@
     "eslint-plugin-jsx-a11y": "^6.3.1",
     "eslint-plugin-react": "^7.20.5",
     "eslint-plugin-react-hooks": "^4.0.0",
-    "mocha": "^8.1.0"
+    "mocha": "^8.1.0",
+    "nodemon": "^2.0.4"
   }
 }
