@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node src/app.js",
-    "dev" : "nodemon src/app.js",
+    "dev": "cross-env NODE_ENV=dev nodemon src/app.js",
+    "prod": "cross-env NODE_ENV=prod node src/app.js",
     "eslint": "node node_modules/eslint/bin/eslint . --fix",
     "test": "node node_modules/mocha/bin/mocha tests/*.js",
     "test:watch": "node node_modules/mocha/bin/mocha tests/*.js -w"
@@ -17,6 +17,8 @@
     "@hapi/hapi": "^19.2.0",
     "@hapi/joi": "^17.1.1",
     "bcrypt": "^5.0.0",
+    "cross-env": "^7.0.2",
+    "dotenv": "^8.2.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.26"
   },

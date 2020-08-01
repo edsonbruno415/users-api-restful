@@ -1,7 +1,7 @@
 const Mongoose = require('mongoose');
 const IContext = require('../context/Icontext/Icontext');
 
-const uri = 'mongodb://edsonbruno:api3007@localhost:27017/users';
+const uri = process.env.MONGO_URL;
 const options = {
   useNewUrlParser: true,
   useUnifiedTopology: true,

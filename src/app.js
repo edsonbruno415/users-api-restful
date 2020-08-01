@@ -1,3 +1,17 @@
+const { config } = require('dotenv');
+const path = require('path');
+const assert = require('assert');
+
+const env = process.env.NODE_ENV || 'dev';
+
+assert.ok(env === 'prod' || env === 'dev', 'A env é inválida, ou é dev ou prod');
+
+const configPath = path.join(__dirname, '..', './config', `.env.${env}`);
+
+config({
+  path: configPath,
+});
+
 const Hapi = require('@hapi/hapi');
 const Joi = require('@hapi/joi');
 const Context = require('./models/context/context');
@@ -13,8 +27,7 @@ async function main() {
   const users = new Context(new MongoStrategy(connection, userSchema));
 
   const app = Hapi.server({
-    port: 3333,
-    host: 'localhost',
+    port: process.env.PORT,
   });
 
   app.route([

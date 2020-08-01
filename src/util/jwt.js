@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const PRIVATE_KEY = '$Api-users-3007';
+const PRIVATE_KEY = process.env.JWT_PRIVATE_KEY;
 
 async function getToken(payload) {
   const token = await jwt.sign(payload, PRIVATE_KEY);
