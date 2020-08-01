@@ -151,7 +151,7 @@ async function main() {
 
           const result = await jwt.verifyToken(token);
 
-          const [userDB] = await users.read({ email: result.email });
+          const [userDB] = await users.read({ _id: userId });
 
           if (userDB.token !== token) {
             return h.response({
@@ -159,9 +159,21 @@ async function main() {
             }).code(401);
           }
 
-          const [query] = await users.read({ _id: userId });
+          const userStr = JSON.stringify(userDB);
+          const json = JSON.parse(userStr);
 
-          return query;
+          const telefones = json.telefones.map((tel) => ({ numero: tel.numero, ddd: tel.ddd }));
+
+          const userJSON = {
+            id: json._id,
+            ...json,
+            telefones,
+          };
+          delete userJSON._id;
+          delete userJSON.__v;
+
+          return userJSON;
+
         } catch (err) {
           return h.response({
             mensagem: err.message,
