@@ -112,8 +112,8 @@ async function main() {
             ...json,
             telefones,
           };
-          delete userJSON['_id'];
-          delete userJSON['__v'];
+          delete userJSON._id;
+          delete userJSON.__v;
 
           return userJSON;
         } catch (err) {
