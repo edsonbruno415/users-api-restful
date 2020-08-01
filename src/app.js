@@ -71,6 +71,51 @@ async function main() {
         }
       },
     },
+    {
+      method: 'POST',
+      path: '/sign_in',
+      options: {
+        validate: {
+          payload: Joi.object({
+            email: Joi.string().min(3).required(),
+            senha: Joi.string().min(6).required(),
+          }),
+        },
+      },
+      handler: async (request, h) => {
+        const user = request.payload;
+
+        const [userDB] = await users.read({ email: user.email });
+
+        if (!userDB) {
+          return h.response({
+            mensagem: 'Usuário e/ou senha inválidos',
+          }).code(401);
+        }
+
+        const isEqual = await hashPassword.compare(user.senha, userDB.senha);
+
+        if (!isEqual) {
+          return h.response({
+            mensagem: 'Usuário e/ou senha inválidos',
+          }).code(401);
+        }
+
+        const userStr = JSON.stringify(userDB);
+        const json = JSON.parse(userStr);
+
+        const telefones = json.telefones.map((tel) => ({ numero: tel.numero, ddd: tel.ddd }));
+
+        const userJSON = {
+          id: json._id,
+          ...json,
+          telefones,
+        };
+        delete userJSON._id;
+        delete userJSON.__v;
+        return userJSON;
+      },
+    },
   ]);
 
   await app.start();

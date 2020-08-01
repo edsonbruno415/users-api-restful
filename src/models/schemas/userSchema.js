@@ -23,9 +23,9 @@ const userSchema = mongoose.Schema({
     required: true,
   },
   telefones: [telefones],
-  data_criacao: Date,
-  data_atualizacao: Date,
-  ultimo_login: Date,
+  data_criacao: String,
+  data_atualizacao: String,
+  ultimo_login: String,
   token: String,
 });
 
