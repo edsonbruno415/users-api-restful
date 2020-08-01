@@ -2,13 +2,7 @@ const Context = require('../src/models/context/context');
 const MongoStrategy = require('../src/models/mongoStrategy/mongoStrategy');
 const UserSchema = require('../src/models/schemas/user');
 const assert = require('assert');
-const { Mongoose } = require('mongoose');
-
-function DateToString(date) {
-  let options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-  let DateString = date.toLocaleDateString('pt-BR', options);
-  return DateString;
-}
+const DateToString = require('../src/util/dateToString');
 
 const MOCK_USER_CADASTRAR = {
   nome: 'Bruno Ramalho',
