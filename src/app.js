@@ -5,7 +5,8 @@ const MongoStrategy = require('./models/mongoStrategy/mongoStrategy');
 const userSchema = require('./models/schemas/userSchema');
 const jwt = require('./util/jwt');
 const hashPassword = require('./util/hashPassword');
-const DateToString = require('./util/dateToString');
+
+const TIME_BETWEEN_SESSIONS = 1800000; // 30 minutos
 
 async function main() {
   const connection = MongoStrategy.connect();
@@ -51,9 +52,9 @@ async function main() {
             id: '',
             ...user,
             senha: await hashPassword.createHash(user.senha),
-            data_criacao: DateToString(new Date()),
-            data_atualizacao: DateToString(new Date()),
-            ultimo_login: DateToString(new Date()),
+            data_criacao: new Date(),
+            data_atualizacao: new Date(),
+            ultimo_login: new Date(),
             token: await jwt.getToken({
               nome: user.nome,
               email: user.email,
@@ -102,6 +103,10 @@ async function main() {
             }).code(401);
           }
 
+          await users.update({ _id: userDB._id }, {
+            ultimo_login: new Date(),
+          });
+
           const userStr = JSON.stringify(userDB);
           const json = JSON.parse(userStr);
 
@@ -149,7 +154,7 @@ async function main() {
 
           const token = authentication.toString().split(' ').pop();
 
-          const result = await jwt.verifyToken(token);
+          // const result = await jwt.verifyToken(token);
 
           const [userDB] = await users.read({ _id: userId });
 
@@ -158,6 +163,22 @@ async function main() {
               mensagem: 'Não autorizado!',
             }).code(401);
           }
+
+          const ultimaVezLogado = new Date(userDB.ultimo_login).getTime();
+          const dataAgora = new Date().getTime();
+          const diferencaTempo = dataAgora - ultimaVezLogado;
+
+          const tempoLimite = TIME_BETWEEN_SESSIONS;
+
+          if (diferencaTempo < tempoLimite) {
+            return h.response({
+              mensagem: 'Sessão Inválida!',
+            }).code(401);
+          }
+
+          await users.update({ _id: userDB._id }, {
+            ultimo_login: new Date(),
+          });
 
           const userStr = JSON.stringify(userDB);
           const json = JSON.parse(userStr);
@@ -173,7 +194,6 @@ async function main() {
           delete userJSON.__v;
 
           return userJSON;
-
         } catch (err) {
           return h.response({
             mensagem: err.message,
