@@ -83,38 +83,98 @@ async function main() {
         },
       },
       handler: async (request, h) => {
-        const user = request.payload;
+        try {
+          const user = request.payload;
 
-        const [userDB] = await users.read({ email: user.email });
+          const [userDB] = await users.read({ email: user.email });
 
-        if (!userDB) {
+          if (!userDB) {
+            return h.response({
+              mensagem: 'Usuário e/ou senha inválidos!',
+            }).code(401);
+          }
+
+          const isEqual = await hashPassword.compare(user.senha, userDB.senha);
+
+          if (!isEqual) {
+            return h.response({
+              mensagem: 'Usuário e/ou senha inválidos!',
+            }).code(401);
+          }
+
+          const userStr = JSON.stringify(userDB);
+          const json = JSON.parse(userStr);
+
+          const telefones = json.telefones.map((tel) => ({ numero: tel.numero, ddd: tel.ddd }));
+
+          const userJSON = {
+            id: json._id,
+            ...json,
+            telefones,
+          };
+          delete userJSON['_id'];
+          delete userJSON['__v'];
+
+          return userJSON;
+        } catch (err) {
           return h.response({
-            mensagem: 'Usuário e/ou senha inválidos',
-          }).code(401);
+            mensagem: err.message,
+          });
         }
-
-        const isEqual = await hashPassword.compare(user.senha, userDB.senha);
-
-        if (!isEqual) {
-          return h.response({
-            mensagem: 'Usuário e/ou senha inválidos',
-          }).code(401);
-        }
-
-        const userStr = JSON.stringify(userDB);
-        const json = JSON.parse(userStr);
-
-        const telefones = json.telefones.map((tel) => ({ numero: tel.numero, ddd: tel.ddd }));
-
-        const userJSON = {
-          id: json._id,
-          ...json,
-          telefones,
-        };
-        delete userJSON._id;
-        delete userJSON.__v;
-        return userJSON;
       },
+    },
+    {
+      method: 'POST',
+      path: '/search_user/{user_id}',
+      options: {
+        validate: {
+          headers: Joi.object({
+            authentication: Joi.string().required(),
+          }),
+          options: {
+            allowUnknown: true,
+          },
+        },
+      },
+      handler: async (request, h) => {
+        try {
+          const { authentication } = request.headers;
+          const userId = request.params.user_id;
+
+          if (!authentication) {
+            return h.response({
+              mensagem: 'Não autorizado!',
+            }).code(401);
+          }
+
+          const token = authentication.toString().split(' ').pop();
+
+          const result = await jwt.verifyToken(token);
+
+          const [userDB] = await users.read({ email: result.email });
+
+          if (userDB.token !== token) {
+            return h.response({
+              mensagem: 'Não autorizado!',
+            }).code(401);
+          }
+
+          const [query] = await users.read({ _id: userId });
+
+          return query;
+        } catch (err) {
+          return h.response({
+            mensagem: err.message,
+          });
+        }
+      },
+    },
+    {
+      method: '*',
+      path: '/{any*}',
+      handler: (request, h) => (h.response({
+        mensagem: 'Não encontrado!',
+      }).code(404)),
     },
   ]);
 

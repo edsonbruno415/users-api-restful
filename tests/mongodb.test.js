@@ -34,7 +34,7 @@ describe('Testes com MongoDB', function () {
     const connection = MongoStrategy.connect();
     context = new Context(new MongoStrategy(connection, UserSchema));
   });
-  it('Cadastrar um novo usuario', async () => {
+  it.only('Cadastrar um novo usuario', async () => {
     const result = await context.create(MOCK_USER_CADASTRAR);
     MOCK_ID_CADASTRADO = result._id;
 

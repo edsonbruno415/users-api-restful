@@ -8,7 +8,8 @@ async function getToken(payload) {
 }
 
 async function verifyToken(token) {
-  const payload = await jwt.verify(token, PRIVATE_KEY);
+  let payload = {};
+  payload = await jwt.verify(token, PRIVATE_KEY);
   return payload;
 }
 
