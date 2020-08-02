@@ -10,6 +10,9 @@ function Routes(users) {
       method: 'POST',
       path: '/sign_up',
       options: {
+        description: 'Cadastrar um novo usuário',
+        notes: 'Retorna os dados cadastrados',
+        tags: ['api'],
         validate: {
           payload: Joi.object({
             nome: Joi.string().min(3).max(45).required(),
@@ -33,6 +36,9 @@ function Routes(users) {
       method: 'POST',
       path: '/sign_in',
       options: {
+        description: 'Fazer o login de usuário',
+        notes: 'Retorna os dados já existentes do usuário',
+        tags: ['api'],
         validate: {
           payload: Joi.object({
             email: Joi.string().min(3).required(),
@@ -49,7 +55,13 @@ function Routes(users) {
       method: 'POST',
       path: '/search_user/{user_id}',
       options: {
+        description: 'Buscar o usuário',
+        notes: 'Retorna as credenciais do usuário, cada requisição exige um tempo de espera até a próxima',
+        tags: ['api'],
         validate: {
+          params: Joi.object({
+            user_id: Joi.string().required(),
+          }),
           headers: Joi.object({
             authentication: Joi.string().required(),
           }),
