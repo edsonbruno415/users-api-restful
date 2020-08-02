@@ -13,14 +13,20 @@ config({
 });
 
 const Hapi = require('@hapi/hapi');
+const Context = require('./models/context/context');
+const MongoStrategy = require('./models/mongoStrategy/mongoStrategy');
+const userSchema = require('./models/schemas/userSchema');
 const routes = require('./routes/routes');
 
 async function main() {
+  const connection = MongoStrategy.connect();
+  const users = new Context(new MongoStrategy(connection, userSchema));
+
   const app = Hapi.server({
     port: process.env.PORT,
   });
 
-  app.route(routes());
+  app.route(routes(users));
 
   await app.start();
 
