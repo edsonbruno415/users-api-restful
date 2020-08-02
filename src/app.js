@@ -20,7 +20,7 @@ const userSchema = require('./models/schemas/userSchema');
 const jwt = require('./util/jwt');
 const hashPassword = require('./util/hashPassword');
 
-const TIME_BETWEEN_SESSIONS = 1800000; // 30 minutos
+const TIME_BETWEEN_SESSIONS = process.env.TIME_SESSION;
 
 async function main() {
   const connection = MongoStrategy.connect();
