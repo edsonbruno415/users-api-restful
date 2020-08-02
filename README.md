@@ -9,6 +9,7 @@
 * Utilizar JWT para autorização
 * Retornar as credenciais com base no token e id do usuário
 * Estipular intervalo entre requisições ao retorna credenciais
+* Utilizar Swagger para gerar a documentação da API
 
 ![](api.gif)
 
