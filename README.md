@@ -10,6 +10,8 @@
 * Retornar as credenciais com base no token e id do usuário
 * Estipular intervalo entre requisições ao retorna credenciais
 
+![](api.gif)
+
 Acesse o projeto em: https://api-users-30.herokuapp.com/documentation
 
 #### Como executar o projeto
