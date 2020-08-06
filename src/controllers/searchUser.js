@@ -3,24 +3,19 @@ const TIME_BETWEEN_SESSIONS = process.env.TIME_SESSION;
 function searchUser(users) {
   async function post(request, h) {
     try {
-      const { authentication } = request.headers;
       const userId = request.params.user_id;
-
-      if (!authentication) {
-        return h.response({
-          mensagem: 'Não autorizado!',
-        }).code(401);
-      }
-
-      const tokenHeaders = authentication.toString().split(' ').pop();
-
       const [userDB] = await users.read({ _id: userId });
-
-      if (userDB.token !== tokenHeaders) {
-        return h.response({
-          mensagem: 'Não autorizado!',
-        }).code(401);
-      }
+      const {
+        id,
+        nome,
+        email,
+        senha,
+        telefones,
+        data_criacao,
+        data_atualizacao,
+        ultimo_login,
+        token,
+      } = userDB;
 
       const ultimaVezLogado = new Date(userDB.ultimo_login).getTime();
       const dataAgora = new Date().getTime();
@@ -34,23 +29,11 @@ function searchUser(users) {
         }).code(401);
       }
 
-      const {
-        id,
-        nome,
-        email,
-        senha,
-        telefones,
-        data_criacao,
-        data_atualizacao,
-        ultimo_login,
-        token,
-      } = userDB;
-
       await users.update({ _id: id }, {
         ultimo_login: new Date(),
       });
 
-      const telefonesWithoutId = telefones.map((tel) => ({ 
+      const telefonesWithoutId = telefones.map((tel) => ({
         numero: tel.numero,
         ddd: tel.ddd,
       }));

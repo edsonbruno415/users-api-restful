@@ -69,6 +69,32 @@ function Routes(users) {
             allowUnknown: true,
           },
         },
+        ext: {
+          onPreAuth: {
+            method: async (request, h) => {
+              const { authentication } = request.headers;
+              const userId = request.params.user_id;
+
+              if (!authentication) {
+                return h.response({
+                  mensagem: 'Não autorizado!',
+                }).code(401).takeover();
+              }
+
+              const tokenHeaders = authentication.toString().split(' ').pop();
+
+              const [userDB] = await users.read({ _id: userId });
+
+              if (userDB.token !== tokenHeaders) {
+                return h.response({
+                  mensagem: 'Não autorizado!',
+                }).code(401).takeover();
+              }
+
+              return h.continue;
+            },
+          },
+        },
       },
       handler: SearchUser.post,
     };

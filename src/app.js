@@ -16,6 +16,7 @@ const Hapi = require('@hapi/hapi');
 const HapiSwagger = require('hapi-swagger');
 const Vision = require('@hapi/vision');
 const Inert = require('@hapi/inert');
+const { request } = require('http');
 const Context = require('./models/context/context');
 const MongoStrategy = require('./models/mongoStrategy/mongoStrategy');
 const userSchema = require('./models/schemas/userSchema');
@@ -45,6 +46,25 @@ async function main() {
       options: swaggerOptions,
     },
   ]);
+
+  const authUserSearch = {
+    name: 'authUserSearch',
+    version: '1.0.0',
+    async register(server, options) {
+      server.route({
+        method: 'POST',
+        path: '/user_search/',
+        handler: (request, h) => {
+          console.log('Hello');
+          h.continue;
+        },
+      });
+    },
+  };
+
+  await app.register({
+    plugin: authUserSearch,
+  });
 
   app.route(routes(users));
 
