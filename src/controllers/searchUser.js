@@ -12,11 +12,11 @@ function searchUser(users) {
         }).code(401);
       }
 
-      const token = authentication.toString().split(' ').pop();
+      const tokenHeaders = authentication.toString().split(' ').pop();
 
       const [userDB] = await users.read({ _id: userId });
 
-      if (userDB.token !== token) {
+      if (userDB.token !== tokenHeaders) {
         return h.response({
           mensagem: 'Não autorizado!',
         }).code(401);
@@ -34,22 +34,38 @@ function searchUser(users) {
         }).code(401);
       }
 
-      await users.update({ _id: userDB._id }, {
+      const {
+        id,
+        nome,
+        email,
+        senha,
+        telefones,
+        data_criacao,
+        data_atualizacao,
+        ultimo_login,
+        token,
+      } = userDB;
+
+      await users.update({ _id: id }, {
         ultimo_login: new Date(),
       });
 
-      const userStr = JSON.stringify(userDB);
-      const json = JSON.parse(userStr);
-
-      const telefones = json.telefones.map((tel) => ({ numero: tel.numero, ddd: tel.ddd }));
+      const telefonesWithoutId = telefones.map((tel) => ({ 
+        numero: tel.numero,
+        ddd: tel.ddd,
+      }));
 
       const userJSON = {
-        id: json._id,
-        ...json,
-        telefones,
+        id,
+        nome,
+        email,
+        senha,
+        telefones: telefonesWithoutId,
+        data_criacao,
+        data_atualizacao,
+        ultimo_login,
+        token,
       };
-      delete userJSON._id;
-      delete userJSON.__v;
 
       return userJSON;
     } catch (err) {

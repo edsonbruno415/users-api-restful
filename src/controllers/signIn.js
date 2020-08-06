@@ -21,22 +21,38 @@ function signIn(users) {
         }).code(401);
       }
 
-      await users.update({ _id: userDB._id }, {
+      const {
+        id,
+        nome,
+        email,
+        senha,
+        telefones,
+        data_criacao,
+        data_atualizacao,
+        ultimo_login,
+        token,
+      } = userDB;
+
+      const telefonesWithoutId = telefones.map((tel) => ({
+        numero: tel.numero,
+        ddd: tel.ddd,
+      }));
+
+      await users.update({ _id: id }, {
         ultimo_login: new Date(),
       });
 
-      const userStr = JSON.stringify(userDB);
-      const json = JSON.parse(userStr);
-
-      const telefones = json.telefones.map((tel) => ({ numero: tel.numero, ddd: tel.ddd }));
-
       const userJSON = {
-        id: json._id,
-        ...json,
-        telefones,
+        id,
+        nome,
+        email,
+        senha,
+        telefones: telefonesWithoutId,
+        data_criacao,
+        data_atualizacao,
+        ultimo_login,
+        token,
       };
-      delete userJSON._id;
-      delete userJSON.__v;
 
       return userJSON;
     } catch (err) {
