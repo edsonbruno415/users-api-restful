@@ -29,12 +29,16 @@ function signUp(users) {
 
       const { id } = await users.create(newUser);
 
-      newUser.id = id;
-      return h.response(newUser).code(201);
+      const userResponse = {
+        id,
+        ...newUser,
+      };
+
+      return h.response(userResponse).code(201);
     } catch (err) {
       return h.response({
         mensagem: err.message,
-      });
+      }).code(500);
     }
   }
 

@@ -14,8 +14,6 @@ function searchUser(users) {
 
       const token = authentication.toString().split(' ').pop();
 
-      // const result = await jwt.verifyToken(token);
-
       const [userDB] = await users.read({ _id: userId });
 
       if (userDB.token !== token) {
@@ -57,7 +55,7 @@ function searchUser(users) {
     } catch (err) {
       return h.response({
         mensagem: err.message,
-      });
+      }).code(500);
     }
   }
 

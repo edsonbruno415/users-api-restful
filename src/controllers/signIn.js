@@ -42,7 +42,7 @@ function signIn(users) {
     } catch (err) {
       return h.response({
         mensagem: err.message,
-      });
+      }).code(500);
     }
   }
 
